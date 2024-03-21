@@ -26,7 +26,7 @@ namespace Application.TodoItem.Handlers
 
         public async Task<TodoItemListViewModel> Handle(GetTodoItemsListQuery request, CancellationToken cancellationToken)
         {
-            var todoItems = await dbContext.TodoItems.ProjectTo<TodoItemViewModel>(mapper.ConfigurationProvider).ToListAsync(cancellationToken);
+            var todoItems = await dbContext.TodoItems.OrderBy(x => x.Name).ProjectTo<TodoItemViewModel>(mapper.ConfigurationProvider).ToListAsync(cancellationToken);
 
             return new TodoItemListViewModel
             {
