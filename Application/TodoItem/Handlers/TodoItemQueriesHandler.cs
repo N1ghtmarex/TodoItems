@@ -4,10 +4,12 @@ using Application.TodoItem.Queries;
 using MediatR;
 using Domain;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 
 namespace Application.TodoItem.Handlers
 {
-    internal class TodoItemQueriesHandler(ApplicationDbContext dbContext)
+    internal class TodoItemQueriesHandler(ApplicationDbContext dbContext, IMapper mapper)
         : IRequestHandler<GetTodoItemQuery, TodoItemViewModel>, IRequestHandler<GetTodoItemsListQuery, TodoItemListViewModel>
     {
         public async Task<TodoItemViewModel> Handle(GetTodoItemQuery request, CancellationToken cancellationToken)
@@ -19,16 +21,12 @@ namespace Application.TodoItem.Handlers
                 throw new Exception("not found");
             }
 
-            return new TodoItemViewModel
-            {
-                Name = todoItem.Name,
-                IsComplete = todoItem.IsComplete
-            };
+            return mapper.Map<TodoItemViewModel>(todoItem);
         }
 
         public async Task<TodoItemListViewModel> Handle(GetTodoItemsListQuery request, CancellationToken cancellationToken)
         {
-            var todoItems = await dbContext.TodoItems.ToListAsync(cancellationToken);
+            var todoItems = await dbContext.TodoItems.ProjectTo<TodoItemViewModel>(mapper.ConfigurationProvider).ToListAsync(cancellationToken);
 
             return new TodoItemListViewModel
             {

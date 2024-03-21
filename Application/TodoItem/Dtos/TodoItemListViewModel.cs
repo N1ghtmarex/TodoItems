@@ -1,7 +1,9 @@
-﻿namespace Application.TodoItem.Dtos
+﻿using Abstractions.CommonModels;
+
+namespace Application.TodoItem.Dtos
 {
     public class TodoItemListViewModel
     {
-        public required List<Domain.Entities.TodoItem> TodoItems { get; set; }
+        public required List<TodoItemViewModel> TodoItems { get; set; }
     }
 }
