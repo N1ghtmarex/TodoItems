@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo</title>
+</head>
+<body>
+    
+  <div id="test">
+    <script>
+      const url='https://localhost:7120/api/admin/todoitems';
+      fetch(url)
+        .then(data => data.json())
+        .then(response => 
+        {
+          const todoHeader = document.createElement('span');
+          todoHeader.textContent = 'Список дел:';
+          document.getElementById('test').append(todoHeader);
+
+          response.todoItems.forEach(element => {
+            let li = document.createElement('li');
+            li.classList.add('todoItemId');
+
+            let deleteIcon = document.createElement('span');
+            deleteIcon.textContent = '❌'
+            li.append(deleteIcon);
+
+            deleteIcon.addEventListener('click', function() {
+              let item = document.querySelector('li[data-todo-item-id="' + li.dataset.todoItemId + '"]')
+              item.remove();
+
+              fetch(url, {
+                method: 'DELETE',
+                headers: {
+                  'Content-type': 'application/json'
+                },
+                body: JSON.stringify({
+                  id: li.dataset.todoItemId,
+                })
+              })
+            })
+
+            let checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = 'check';
+
+            checkbox.addEventListener('click', function() {
+              if (checkbox.checked)
+              {
+                name.style.color = 'green';
+              }
+              else
+              {
+                name.style.color = 'red';
+              }
+              
+              fetch(url, {
+                method: 'PUT',
+                headers: {
+                  'Content-type': 'application/json'
+                },
+                body: JSON.stringify({
+                  id: li.dataset.todoItemId,
+                  isComplete: checkbox.checked
+                })
+              });
+  
+            })
+
+            if (element.isComplete == true)
+            {
+              checkbox.checked = true;
+            }
+
+            li.append(checkbox);
+
+            li.dataset.todoItemId = element.id;
+            
+            let name = document.createElement('span');
+            name.textContent = element.name;
+
+            if (checkbox.checked)
+            {
+              name.style.color = 'green';
+            }
+            else
+            {
+              name.style.color = 'red';
+            }
+
+            li.append(name);
+
+            li.id = 'todo';
+
+            document.getElementById('test').append(li);
+          })
+        }
+        );
+    </script>
+
+    <div id="add">
+      <span>Добавить элемент:<br></span>
+      <input id="name" placeholder="Название">
+      <input id="add-element" type="submit" value="Добавить">
+    </div>
+
+    <script>
+      document.getElementById('add-element').addEventListener('click', function() {
+        let text = document.getElementById('name').value;
+        if (text == '')
+        {
+          alert('Не указано название!')
+        }
+        else
+        {
+          fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-type': 'application/json'
+            },
+            body: JSON.stringify({
+              name: text
+            })
+          })
+          .then(response => { location.reload(); });
+        }
+      })
+    </script>
+
+    <div id="getById">
+      <span>Получить по идентификатору:<br></span>
+      <input id="input-id" placeholder="Guid">
+      <input id="get-by-id" type="submit" value="Получить">
+      <br>
+    </div>
+
+    <script>
+      document.getElementById('get-by-id').addEventListener('click', function() {
+        let text = document.getElementById('input-id').value;
+        if (text == '')
+        {
+          alert('Не указан идентификатор!')
+        }
+        else
+        {
+          fetch(url + '/' + text)
+          .then(data => data.json())
+          .then(response => { 
+            const title = document.createElement('span');
+            title.textContent = response.name;
+
+            if (response.isComplete)
+            {
+              title.style.color = "green";
+            }
+            else
+            {
+              title.style.color = "red";
+            }
+
+            document.getElementById('getById').append(title);
+           });
+        }
+      })
+    </script>
+
+  </div>
+</body>
+</html>

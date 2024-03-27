@@ -33,4 +33,6 @@ app.MapControllers();
 
 app.UseCors("AllowAll");
 
+app.UseStaticFiles();
+
 app.Run();
